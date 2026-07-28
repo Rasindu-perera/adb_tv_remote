@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'connection_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,29 +17,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const ConnectionScreen(),
-    );
-  }
-}
-
-/// The initial screen for connecting to the Android TV.
-class ConnectionScreen extends StatefulWidget {
-  const ConnectionScreen({super.key});
-
-  @override
-  State<ConnectionScreen> createState() => _ConnectionScreenState();
-}
-
-class _ConnectionScreenState extends State<ConnectionScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connect to TV'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: const Center(
-        child: Text('Enter TV IP Address and connect'),
-      ),
     );
   }
 }
