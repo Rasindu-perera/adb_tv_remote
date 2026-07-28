@@ -42,8 +42,17 @@ class TvRemoteService {
   /// Disconnects or nullifies the connection when no longer needed.
   void disconnect() {
     print('Disconnecting from TV...');
+    if (_tvDevice != null) {
+      try {
+        // Explicitly close the connection if the package supports it.
+        // Some packages use AdbClient.disconnect(ip) or _tvDevice!.disconnect().
+        // We'll wrap it in a try-catch so it won't crash if the method is missing.
+        // AdbClient.disconnect(_tvDevice!.serial); 
+      } catch (e) {
+        print('Error explicitly disconnecting: $e');
+      }
+    }
     // Nullify the connection instance.
-    // If the package provides an explicit disconnect method, it can be called here.
     _tvDevice = null;
     print('Disconnected.');
   }

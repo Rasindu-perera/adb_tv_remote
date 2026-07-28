@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'tv_remote_service.dart';
 
 class RemoteScreen extends StatelessWidget {
@@ -26,7 +27,10 @@ class RemoteScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           customBorder: const CircleBorder(),
-          onTap: () => tvRemoteService.sendKey(keyCode),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            tvRemoteService.sendKey(keyCode);
+          },
           child: Icon(
             icon,
             color: Colors.white,
@@ -46,6 +50,16 @@ class RemoteScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.power_off, color: Colors.redAccent),
+            onPressed: () {
+              HapticFeedback.heavyImpact();
+              tvRemoteService.disconnect();
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
