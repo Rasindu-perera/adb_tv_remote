@@ -45,7 +45,7 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
         // Navigate to the remote control screen if successful
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const RemoteScreen()),
+          MaterialPageRoute(builder: (context) => RemoteScreen(tvRemoteService: _tvRemoteService)),
         );
       } else {
         // Show error message
