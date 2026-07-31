@@ -54,6 +54,27 @@ class TvRemoteService {
     }
   }
 
+  /// Sends mouse movement delta to the connected TV (simulating trackball).
+  Future<void> sendMouseMovement(double dx, double dy) async {
+    if (_connectedIp != null) {
+      try {
+        // Adjust multiplier for sensitivity.
+        // A factor of 1.5 helps make the swiping feel natural.
+        final int moveX = (dx * 1.5).round();
+        final int moveY = (dy * 1.5).round();
+        
+        await Adb.sendSingleCommand(
+          'input roll $moveX $moveY',
+          ip: _connectedIp!, 
+          port: 5555, 
+          crypto: _crypto, 
+        );
+      } catch (e) {
+        // Ignore rapid spam errors silently
+      }
+    }
+  }
+
   /// Sends text to the connected TV (e.g., for search bars).
   Future<void> sendText(String text) async {
     if (_connectedIp != null) {
