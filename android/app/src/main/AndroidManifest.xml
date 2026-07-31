@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="adb_tv_remote"
+        android:label="KWR TV Remote"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
