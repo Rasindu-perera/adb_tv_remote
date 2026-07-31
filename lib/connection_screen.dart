@@ -87,6 +87,52 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
     }
   }
 
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('How to Connect to Your TV'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Method 1: Standard Setup',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 8),
+                Text('• Go to your TV\'s Settings > Device Preferences > About.'),
+                Text('• Scroll down to Build Number and press \'OK\' on your remote 7 times to unlock Developer Options.'),
+                Text('• Go back to the previous menu and open Developer Options.'),
+                Text('• Enable both USB Debugging and Network Debugging.'),
+                Text('• Go to Network & Internet, select your Wi-Fi, and note down the IP Address.'),
+                SizedBox(height: 16),
+                Text(
+                  'Method 2: If Developer Options are Hidden',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 8),
+                Text('If your TV hides the standard settings menu:'),
+                Text('• Download a \'Developer Options Shortcut\' APK on your computer or phone.'),
+                Text('• Copy the APK to a USB drive and plug it into your TV.'),
+                Text('• Use a File Manager on the TV to install and open the shortcut app.'),
+                Text('• It will force-open the hidden menu where you can enable Network Debugging.'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -153,6 +199,12 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
       appBar: AppBar(
         title: const Text('Connect to TV'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => _showHelpDialog(context),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
