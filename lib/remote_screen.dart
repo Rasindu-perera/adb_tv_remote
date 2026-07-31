@@ -7,6 +7,59 @@ class RemoteScreen extends StatelessWidget {
 
   const RemoteScreen({super.key, required this.tvRemoteService});
 
+  void _showKeyboardBottomSheet(BuildContext context) {
+    final TextEditingController textController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: textController,
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: 'Type to send...',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (text) {
+                    if (text.isNotEmpty) {
+                      tvRemoteService.sendText(text);
+                    }
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send, color: Colors.blueAccent),
+                onPressed: () {
+                  if (textController.text.isNotEmpty) {
+                    tvRemoteService.sendText(textController.text);
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildRemoteButton(IconData icon, int keyCode, {Color? color, double size = 60}) {
     return Container(
       width: size,
@@ -51,6 +104,10 @@ class RemoteScreen extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.keyboard, color: Colors.white),
+            onPressed: () => _showKeyboardBottomSheet(context),
+          ),
           IconButton(
             icon: const Icon(Icons.power_off, color: Colors.redAccent),
             onPressed: () {

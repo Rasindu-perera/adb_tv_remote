@@ -54,6 +54,28 @@ class TvRemoteService {
     }
   }
 
+  /// Sends text to the connected TV (e.g., for search bars).
+  Future<void> sendText(String text) async {
+    if (_connectedIp != null) {
+      try {
+        print('Sending text: $text');
+        // Format the text by replacing spaces with %s as required by ADB
+        final formattedText = text.replaceAll(' ', '%s');
+        
+        await Adb.sendSingleCommand(
+          'input text "$formattedText"',
+          ip: _connectedIp!, 
+          port: 5555, 
+          crypto: _crypto, 
+        );
+      } catch (e) {
+        print('Error sending text: $e');
+      }
+    } else {
+      print('Cannot send text: TV is not connected.');
+    }
+  }
+
   /// Disconnects or nullifies the connection when no longer needed.
   void disconnect() {
     print('Disconnecting from TV...');
