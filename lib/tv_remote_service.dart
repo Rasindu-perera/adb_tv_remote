@@ -1,9 +1,14 @@
-import 'package:adb_client/adb_client.dart';
+import 'package:flutter_adb/flutter_adb.dart';
 
 /// Service class to handle ADB connection and commands to the Android TV.
 class TvRemoteService {
-  // Private variable to hold the ADB connection instance
-  AdbDevice? _tvDevice;
+  String? _connectedIp;
+  late final AdbCrypto _crypto;
+
+  TvRemoteService() {
+    // Initialize the crypto keypair used for the ADB connection
+    _crypto = AdbCrypto(adbKeyName: 'adb_tv_remote@dart');
+  }
 
   /// Connects to the TV using its IP address over ADB via Wi-Fi.
   /// Standard ADB over network uses port 5555.
@@ -11,12 +16,17 @@ class TvRemoteService {
     try {
       print('Attempting to connect to TV at $ipAddress:5555...');
       
-      // Connect to the device using the adb_client package
-      // Note: AdbClient.connect might return an AdbDevice or similar,
-      // but if the package API differs, this may need adjustment.
-      _tvDevice = await AdbClient.connect(ipAddress, 5555) as AdbDevice;
+      // flutter_adb is stateless and connects per command.
+      // We test the connection by sending a simple 'echo' command.
+      final result = await Adb.sendSingleCommand(
+        'echo ping',
+        ip: ipAddress, 
+        port: 5555, 
+        crypto: _crypto, 
+      );
       
-      print('Successfully connected to TV at $ipAddress');
+      _connectedIp = ipAddress;
+      print('Successfully connected to TV at $ipAddress (Response: $result)');
       return true;
     } catch (e) {
       print('Error connecting to TV at $ipAddress: $e');
@@ -26,11 +36,16 @@ class TvRemoteService {
 
   /// Sends a key event to the connected TV.
   Future<void> sendKey(int keyCode) async {
-    if (_tvDevice != null) {
+    if (_connectedIp != null) {
       try {
         print('Sending key event: $keyCode');
-        // Execute the shell command on the connected TV
-        await _tvDevice!.shell('input keyevent $keyCode');
+        // Execute the keyevent command
+        await Adb.sendSingleCommand(
+          'input keyevent $keyCode',
+          ip: _connectedIp!, 
+          port: 5555, 
+          crypto: _crypto, 
+        );
       } catch (e) {
         print('Error sending key event $keyCode: $e');
       }
@@ -42,18 +57,9 @@ class TvRemoteService {
   /// Disconnects or nullifies the connection when no longer needed.
   void disconnect() {
     print('Disconnecting from TV...');
-    if (_tvDevice != null) {
-      try {
-        // Explicitly close the connection if the package supports it.
-        // Some packages use AdbClient.disconnect(ip) or _tvDevice!.disconnect().
-        // We'll wrap it in a try-catch so it won't crash if the method is missing.
-        // AdbClient.disconnect(_tvDevice!.serial); 
-      } catch (e) {
-        print('Error explicitly disconnecting: $e');
-      }
-    }
-    // Nullify the connection instance.
-    _tvDevice = null;
+    // Since flutter_adb sends single commands per connection instance in this mode,
+    // disconnecting simply means forgetting the IP address.
+    _connectedIp = null;
     print('Disconnected.');
   }
 }
