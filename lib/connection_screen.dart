@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 import 'tv_remote_service.dart';
 import 'remote_screen.dart';
 
@@ -19,6 +21,71 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   
   // Loading state for UI updates
   bool _isLoading = false;
+  bool _isScanning = false;
+
+  Future<void> _scanNetworkForTv() async {
+    setState(() {
+      _isScanning = true;
+    });
+
+    try {
+      final info = NetworkInfo();
+      final wifiIP = await info.getWifiIP();
+      
+      if (wifiIP != null && wifiIP.isNotEmpty) {
+        final subnet = wifiIP.substring(0, wifiIP.lastIndexOf('.'));
+        bool found = false;
+
+        for (int i = 1; i < 255; i++) {
+          final ipToTest = '$subnet.$i';
+          try {
+            final socket = await Socket.connect(ipToTest, 5555, timeout: const Duration(milliseconds: 300));
+            socket.destroy();
+            
+            if (mounted) {
+              setState(() {
+                _ipController.text = ipToTest;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('TV Found: $ipToTest'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+            found = true;
+            break;
+          } catch (e) {
+            // Ignore connection errors and continue scanning
+          }
+        }
+
+        if (!found && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No TV found on port 5555.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Network error: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -132,6 +199,17 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
                           style: TextStyle(fontSize: 18),
                         ),
                 ),
+              ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: _isScanning || _isLoading ? null : _scanNetworkForTv,
+                icon: _isScanning 
+                    ? const SizedBox(
+                        width: 16, height: 16, 
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                      ) 
+                    : const Icon(Icons.search),
+                label: Text(_isScanning ? 'Scanning...' : 'Scan for TV on Network'),
               ),
             ],
           ),
