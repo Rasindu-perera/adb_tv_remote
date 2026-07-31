@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'tv_remote_service.dart';
 import 'remote_screen.dart';
 
@@ -18,6 +19,22 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   
   // Loading state for UI updates
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedIp();
+  }
+
+  Future<void> _loadSavedIp() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedIp = prefs.getString('saved_tv_ip');
+    if (savedIp != null && savedIp.isNotEmpty) {
+      setState(() {
+        _ipController.text = savedIp;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -42,6 +59,10 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
       });
 
       if (success) {
+        // Save the successful IP address
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('saved_tv_ip', ipAddress);
+
         // Navigate to the remote control screen if successful
         Navigator.push(
           context,
