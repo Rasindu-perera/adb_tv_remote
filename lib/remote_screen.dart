@@ -122,13 +122,17 @@ class RemoteScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Power Button (Top Area)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildRemoteButton(Icons.power_settings_new, 26, color: Colors.redAccent),
-                const SizedBox(width: 30),
-              ],
+            // Top Area: Power, Mute, Source
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildRemoteButton(Icons.power_settings_new, 26, color: Colors.redAccent),
+                  _buildRemoteButton(Icons.volume_off, 164), // Mute
+                  _buildRemoteButton(Icons.input, 178),      // Source/Input
+                ],
+              ),
             ),
             
             const Spacer(),
@@ -181,30 +185,41 @@ class RemoteScreen extends StatelessWidget {
             
             const Spacer(),
             
-            // Bottom Area Buttons
+            // Navigation and Volume Buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Column(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildRemoteButton(Icons.arrow_back, 4),
-                      _buildRemoteButton(Icons.home, 3),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildRemoteButton(Icons.volume_down, 25),
-                      _buildRemoteButton(Icons.volume_up, 24),
-                    ],
-                  ),
+                  _buildRemoteButton(Icons.arrow_back, 4),
+                  _buildRemoteButton(Icons.home, 3),
+                  _buildRemoteButton(Icons.volume_down, 25),
+                  _buildRemoteButton(Icons.volume_up, 24),
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            
+            const Spacer(),
+            
+            // Media Player Row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Wrap(
+                spacing: 15,
+                runSpacing: 15,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildRemoteButton(Icons.skip_previous, 88, size: 50),
+                  _buildRemoteButton(Icons.fast_rewind, 89, size: 50),
+                  _buildRemoteButton(Icons.play_arrow, 85, size: 50), // Play/Pause
+                  _buildRemoteButton(Icons.stop, 86, size: 50),
+                  _buildRemoteButton(Icons.fast_forward, 90, size: 50),
+                  _buildRemoteButton(Icons.skip_next, 87, size: 50),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
           ],
         ),
       ),
